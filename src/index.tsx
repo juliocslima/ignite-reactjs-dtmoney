@@ -1,47 +1,56 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createServer } from 'miragejs';
+import { createServer, Model } from 'miragejs';
 import { App } from './App';
 
 createServer({
+
+  models: {
+    transaction: Model,
+  },
+
+  seeds(server) {
+    server.db.loadData({
+      transactions: [
+        {
+          id: 1,
+          title: 'Desenvolvimento de website',
+          type: 'deposit',
+          category: 'dev',
+          amount: 12000,
+          createdAt: new Date('2021-11-01 09:00')
+        },
+        {
+          id: 2,
+          title: 'Aluguel',
+          type: 'withdraw',
+          category: 'home',
+          amount: 1200,
+          createdAt: new Date('2021-11-15 18:30')
+        },
+        {
+          id: 3,
+          title: 'Lanche',
+          type: 'withdraw',
+          category: 'food',
+          amount: 99.5,
+          createdAt: new Date('2021-11-22 23:00')
+        }
+      ]
+    })
+  },
+
   routes() {
     this.namespace = 'api';
 
     this.get('/transactions', () => {
-      return [
-        {
-          id: 1,
-          title: 'Desenvolvimento de website',
-          amount: 12000,
-          type: 'deposit',
-          category: 'Recipe',
-          date: new Date()
-        },
-        {
-          id: 2,
-          title: 'aluguel',
-          amount: 12000,
-          type: 'withdraw',
-          category: 'House',
-          date: new Date()
-        },
-        {
-          id: 3,
-          title: 'Cashback',
-          amount: 500,
-          type: 'deposit',
-          category: 'Recipe',
-          date: new Date()
-        },
-        {
-          id: 4,
-          title: 'Almoço',
-          amount: 95.6,
-          type: 'withdraw',
-          category: 'Food',
-          date: new Date()
-        }
-      ]
+      return this.schema.all('transaction')
+    })
+
+    this.post('/transactions', (schema, request) => {
+      const data = JSON.parse(request.requestBody);
+
+      return schema.create('transaction', data);
     })
   }
 })
